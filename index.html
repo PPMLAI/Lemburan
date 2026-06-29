@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemeriksaan Penerangan LAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); height: 100%; }
+        .header-title { background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%); color: white; padding: 25px; border-radius: 15px 15px 0 0; text-align: center; }
+        .btn-submit { background: #0d47a1; color: white; font-weight: bold; border-radius: 8px; transition: 0.3s; }
+        .btn-submit:hover { background: #1565c0; transform: translateY(-2px); color: white; }
+        .form-label { font-weight: 600; color: #444; }
+        #loading { display: none; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+        .footer-text { text-align: center; color: #777; font-size: 0.85rem; margin-top: 35px; font-weight: 500; letter-spacing: 0.5px; }
+        
+        /* Optimasi Tampilan Mobile & Desktop */
+        @media (max-width: 991.98px) {
+            .card-table-container { margin-top: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid my-4 px-md-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="header-title shadow-sm">
+                <h3 class="mb-1">Pemeriksaan Rutin Sarana Penerangan</h3>
+                <p class="mb-0 opacity-75">Gedung Lembaga Alkitab Indonesia</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-4 col-md-5">
+            <div class="card p-4">
+                <h5 class="card-title mb-4 text-primary fw-bold">Form Input Laporan</h5>
+                <form id="formPenerangan" onsubmit="handleFormSubmit(this); return false;">
+                    
+                    <div class="mb-3">
+                        <label for="petugas" class="form-label">Nama Petugas</label>
+                        <select class="form-select" id="petugas" name="petugas" required>
+                            <option value="" disabled selected>-- Pilih Nama Petugas --</option>
+                            <option value="Supriyadi">Supriyadi</option>
+                            <option value="Timur Sukoco">Timur Sukoco</option>
+                            <option value="Agus Setiawan">Agus Setiawan</option>
+                            <option value="Ignasius Julio Sasi">Ignasius Julio Sasi</option>
+                            <option value="Joyo S.">Joyo S.</option>
+                            <option value="Agus Purwanto">Agus Purwanto</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tanggal" class="form-label">Tanggal Pemeriksaan</label>
+                        <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="area" class="form-label">Area / Ruangan</label>
+                        <select class="form-select" id="area" name="area" required>
+                            <option value="" disabled selected>-- Pilih Area --</option>
+                            <option value="Lantai 2 Ruang Staff">Lantai 2 Ruang Staff</option>
+                            <option value="Aula">Aula</option>
+                            <option value="Pracetak">Pracetak</option>
+                            <option value="Repro">Repro</option>
+                            <option value="Ruang Produksi">Ruang Produksi</option>
+                            <option value="Toilet Loker Pria dan Wanita">Toilet Loker Pria dan Wanita</option>
+                            <option value="Toilet Produksi BL500">Toilet Produksi BL500</option>
+                            <option value="Toilet Produksi Stahlfolder">Toilet Produksi Stahlfolder</option>
+                            <option value="Parkiran Motor Depan dan Belakang">Parkiran Motor Depan dan Belakang</option>
+                            <option value="Kantin dan Guest House">Kantin dan Guest House</option>
+                            <option value="Gudang Bahan Baku">Gudang Bahan Baku</option>
+                            <option value="Gudang Barang Jadi">Gudang Barang Jadi</option>
+                            <option value="Genset dan Kompresor">Genset dan Kompresor</option>
+                            <option value="Area Luar Gedung">Area Luar Gedung</option>
+                            <option value="Resepsionis">Resepsionis</option>
+                            <option value="Pos Sekurity">Pos Sekurity</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="jenisLampu" class="form-label">Jenis Lampu</label>
+                        <select class="form-select" id="jenisLampu" name="jenisLampu" required>
+                            <option value="" disabled selected>-- Pilih Jenis Lampu --</option>
+                            <option value="TL LED">TL LED</option>
+                            <option value="Bohlam LED">Bohlam LED</option>
+                            <option value="Lainnya">Lainnya / Sensor</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Status Penerangan</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusNormal" value="Normal" checked>
+                            <label class="form-check-label text-success fw-semibold" for="statusNormal">Normal</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusRusak" value="Rusak / Mati">
+                            <label class="form-check-label text-danger fw-semibold" for="statusRusak">Rusak / Mati</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="keterangan" class="form-label">Keterangan / Detail Laporan</label>
+                        <textarea class="form-control" id="keterangan" name="keterangan" rows="2" placeholder="Contoh: Lampu mati di baris ke-2 atau 'Aman'"></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" id="btnSubmit" class="btn btn-submit py-2">Kirim Laporan</button>
+                    </div>
+
+                    <div id="loading" class="text-center mt-3">
+                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                        <p class="text-muted small mt-2 mb-0">Menyimpan laporan...</p>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-7 card-table-container">
+            <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="card-title mb-0 text-primary fw-bold">Dashboard Riwayat Pemeriksaan</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="loadDataDashboard()">🔄 Refresh Data</button>
+                </div>
+                
+                <div class="mb-3">
+                    <input type="text" id="cariData" class="form-control form-control-sm" placeholder="Cari berdasarkan petugas atau area..." onkeyup="filterTabel()">
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-bordered" style="font-size: 0.9rem;">
+                        <thead class="table-primary text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Petugas</th>
+                                <th>Area / Ruangan</th>
+                                <th>Jenis Lampu</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDashboard">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Memuat data dashboard...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-text">
+        © 2026 GUSPUR PPM LAI - Check Penerangan Gedung LAI
+    </div>
+</div>
+
+<script>
+    // MASUKKAN URL APP SCRIPT ANDA DI SINI
+    var webAppUrl = "https://script.google.com/macros/s/AKfycbzVBYHFMwZqqvTwzQbSqJ81ICz1LGKSNKyhUmk2aHBwLT2iC2I5o2lRnEnxuW8BES7g/exec";
+
+    // Muat data dashboard secara otomatis saat halaman terbuka pertama kali
+    document.addEventListener("DOMContentLoaded", function() {
+        // Set otomatis input tanggal ke hari ini agar memudahkan petugas
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('tanggal').value = today;
+        
+        loadDataDashboard();
+    });
+
+    function handleFormSubmit(formObject) {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('btnSubmit').disabled = true;
+
+        var formData = {
+            petugas: formObject.petugas.value,
+            tanggal: formObject.tanggal.value,
+            area: formObject.area.value,
+            jenisLampu: formObject.jenisLampu.value,
+            status: formObject.status.value,
+            keterangan: formObject.keterangan.value || "Aman"
+        };
+
+        fetch(webAppUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(function(result) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = false;
+            
+            if (result.status === "success") {
+                alert('Berhasil! Laporan telah dikirim dan disimpan.');
+                formObject.reset();
+                // Reset kembali tanggal ke hari ini
+                document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
+                loadDataDashboard(); // Perbarui tabel dashboard otomatis
+            } else {
+                alert('Gagal memproses data di server: ' + result.message);
+            }
+        })
+        .catch(function(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = false;
+            alert('Gagal sistem jaringan: ' + error);
+        });
+    }
+
+    function loadDataDashboard() {
+        var tbody = document.getElementById("tbodyDashboard");
+        
+        fetch(webAppUrl + "?action=read")
+        .then(response => response.json())
+        .then(data => {
+            let html = "";
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Belum ada data laporan.</td></tr>`;
+                return;
+            }
+
+            data.forEach((row, i) => {
+                let tgl = "-";
+                if(row[1]) {
+                    let d = new Date(row[1]);
+                    tgl = isNaN(d) ? row[1] : d.toLocaleDateString('id-ID', {day:'2-digit', month:'2-digit', year:'numeric'});
+                }
+                
+                let statusBadge = row[5] === 'Normal' ? 
+                    '<span class="badge bg-success-subtle text-success border border-success-subtle">Normal</span>' : 
+                    '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rusak/Mati</span>';
+                
+                html += `<tr>
+                    <td class="text-center fw-bold">${i + 1}</td>
+                    <td class="text-center">${tgl}</td>
+                    <td class="fw-medium">${row[0] || '-'}</td>
+                    <td>${row[2] || '-'}</td>
+                    <td>${row[3] || '-'}</td>
+                    <td class="text-center">${statusBadge}</td>
+                    <td class="text-muted small">${row[4] || '-'}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        })
+        .catch(error => {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-3">Gagal memuat riwayat data: ${error}</td></tr>`;
+        });
+    }
+
+    function filterTabel() {
+        let key = document.getElementById("cariData").value.toLowerCase();
+        let rows = document.querySelectorAll("#tbodyDashboard tr");
+        rows.forEach(r => {
+            let teks = r.innerText.toLowerCase();
+            r.style.display = teks.includes(key) ? "" : "none";
+        });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

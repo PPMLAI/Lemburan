@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory Control PPM LAI</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#eef3f8;padding:20px;display:flex;flex-direction:column;min-height:100vh}
+.container{max-width:1200px;margin:auto;width:100%;flex:1}
+
+.header{
+    background:#0b5ed7;
+    color:#fff;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    margin-bottom:20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+.header img {
+    max-width: 150px;
+    height: auto;
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.header h2 {
+    font-size: 24px;
+    letter-spacing: 0.5px;
+}
+
+.form{
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 5px rgba(0,0,0,.15);
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+button{
+    margin-top:20px;
+    padding:12px 25px;
+    background:#0b5ed7;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+button:hover{
+    background:#084298;
+}
+.btn-cancel {
+    background: #6c757d;
+}
+.btn-cancel:hover {
+    background: #565e64;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+}
+th{
+    background:#0b5ed7;
+    color:white;
+    padding:10px;
+}
+td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:center;
+}
+.search{
+    width: 100%;
+    margin-top:20px;
+    margin-bottom:10px;
+}
+.btn-action {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    font-weight: normal;
+}
+.btn-edit {
+    background: #ffc107;
+    color: #000;
+}
+.btn-edit:hover {
+    background: #e0a800;
+}
+.btn-delete {
+    background: #dc3545;
+}
+.btn-delete:hover {
+    background: #bd2130;
+}
+.footer {
+    text-align: center;
+    padding: 20px 0 10px 0;
+    color: #666;
+    font-size: 14px;
+    margin-top: 40px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <img src="logo-ppm.png" alt="Logo PPM LAI">
+    <h2>Stock Barang Ruang Teknisi PPM LAI</h2>
+</div>
+
+<div class="form">
+<input type="hidden" id="edit-id">
+
+<div class="grid">
+    <div class="form-group">
+        <label for="nama">Nama Barang</label>
+        <input id="nama" placeholder="Masukkan nama barang">
+    </div>
+
+    <div class="form-group">
+        <label for="tipe">Tipe Barang</label>
+        <input id="tipe" placeholder="Masukkan tipe barang">
+    </div>
+
+    <div class="form-group">
+        <label for="mesin">Untuk Mesin</label>
+        <input id="mesin" placeholder="Nama mesin">
+    </div>
+
+    <div class="form-group">
+        <label for="awal">Stock Awal</label>
+        <input id="awal" type="number" placeholder="0">
+    </div>
+
+    <div class="form-group">
+        <label for="tambah" style="color: #198754;">Tambah Stock (+)</label>
+        <input id="tambah" type="number" value="0" placeholder="0">
+    </div>
+
+    <div class="form-group">
+        <label for="kurang" style="color: #dc3545;">Pengurangan Stock (-)</label>
+        <input id="kurang" type="number" value="0" placeholder="0">
+    </div>
+
+    <div class="form-group">
+        <label for="tanggal">Tanggal</label>
+        <input id="tanggal" type="date">
+    </div>
+</div>
+
+<div class="btn-group">
+    <button id="btn-simpan" onclick="simpan()">Simpan Data</button>
+    <button id="btn-batal" class="btn-cancel" onclick="batalEdit()" style="display: none;">Batal</button>
+</div>
+
+</div>
+
+<input class="search" id="cari" placeholder="Cari Barang..." onkeyup="filterData()">
+
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Nama Barang</th>
+<th>Tipe</th>
+<th>Mesin</th>
+<th>Stock Awal</th>
+<th>Tambah</th>
+<th>Pengurangan</th>
+<th>Tanggal</th>
+<th>Sisa Stock</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tbody">
+    </tbody>
+</table>
+
+</div>
+
+<div class="footer">
+    &copy; 2026 GUSPUR - Barang Teknisi
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbynKH0xyqe8_7QwIObrtWL6Xh6oYvfkLgzwoK_KfbKXWoGu6hHhjoyhl7gHY9G2k7sn/exec";
+
+let data=[];
+let sedangProses = false;
+
+async function loadData(){
+    const res=await fetch(API_URL+"?action=read");
+    data=await res.json();
+    tampil();
+}
+
+function formatTanggalIndonesia(tanggal) {
+  if (!tanggal) return "";
+  if (typeof tanggal === 'string' && tanggal.includes('T')) {
+    tanggal = tanggal.split('T')[0];
+  }
+  const d = new Date(tanggal);
+  if (isNaN(d)) {
+    const p = tanggal.split("-");
+    if (p.length === 3) {
+      if(p[0].length === 4) return `${p[2]}/${p[1]}/${p[0]}`;
+      return `${p[0]}/${p[1]}/${p[2]}`;
+    }
+    return tanggal;
+  }
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+function tampil(){
+    let html="";
+    data.forEach((d,i)=>{
+        let tanggalDiformat = formatTanggalIndonesia(d[7]);
+        // Menambahkan tombol Edit dan Delete di setiap baris data
+        // d[0] adalah ID unik atau baris referensi asli dari Sheets
+        html+=`
+        <tr>
+        <td>${i+1}</td>
+        <td>${d[1]}</td>
+        <td>${d[2]}</td>
+        <td>${d[3]}</td>
+        <td>${d[4]}</td>
+        <td>${d[5]}</td>
+        <td>${d[6]}</td>
+        <td>${tanggalDiformat}</td>
+        <td>${d[8]}</td>
+        <td>
+            <button class="btn-action btn-edit" onclick="pilihEdit(${i})">Edit</button>
+            <button class="btn-action btn-delete" onclick="hapusData('${d[0]}', '${d[1]}')">Hapus</button>
+        </td>
+        </tr>
+        `;
+    });
+    tbody.innerHTML=html;
+}
+
+async function simpan(){
+    if(sedangProses) return;
+
+    const editId = document.getElementById("edit-id").value;
+    const awalStock=Number(awal.value);
+    const tambahStock=Number(tambah.value);
+    const kurangStock=Number(kurang.value);
+
+    // Menentukan aksi: "update" jika ada ID yang sedang diedit, "add" jika data baru
+    const aksi = editId ? "update" : "add";
+
+    const obj={
+        action: aksi,
+        id: editId,
+        nama: nama.value,
+        tipe: tipe.value,
+        mesin: mesin.value,
+        awal: awalStock,
+        tambah: tambahStock,
+        kurang: kurangStock,
+        tanggal: tanggal.value,
+        sisa: awalStock+tambahStock-kurangStock
+    };
+
+    setLoading(true);
+
+    try {
+        await fetch(API_URL,{
+            method:"POST",
+            body:JSON.stringify(obj)
+        });
+        batalEdit();
+        await loadData();
+    } catch(err) {
+        alert("Gagal memproses data.");
+    } finally {
+        setLoading(false);
+    }
+}
+
+function pilihEdit(index) {
+    const d = data[index];
+    
+    // Isi data ke dalam form input
+    document.getElementById("edit-id").value = d[0];
+    nama.value = d[1];
+    tipe.value = d[2];
+    mesin.value = d[3];
+    awal.value = d[4];
+    tambah.value = d[5];
+    kurang.value = d[6];
+    
+    // Format tanggal ke YYYY-MM-DD agar pas di elemen <input type="date">
+    if(d[7]) {
+        let tgl = new Date(d[7]);
+        if(!isNaN(tgl)) {
+            tanggal.value = tgl.toISOString().split('T')[0];
+        } else {
+            tanggal.value = d[7];
+        }
+    }
+
+    // Mengubah tampilan tombol utama menjadi Update
+    document.getElementById("btn-simpan").innerText = "Update Data";
+    document.getElementById("btn-batal").style.display = "inline-block";
+}
+
+function batalEdit() {
+    document.getElementById("edit-id").value = "";
+    bersih();
+    document.getElementById("btn-simpan").innerText = "Simpan Data";
+    document.getElementById("btn-batal").style.display = "none";
+}
+
+async function hapusData(id, namaBarang) {
+    if(sedangProses) return;
+    
+    if(confirm(`Apakah Anda yakin ingin menghapus "${namaBarang}"?`)) {
+        setLoading(true);
+        try {
+            await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "delete", id: id })
+            });
+            await loadData();
+        } catch(err) {
+            alert("Gagal menghapus data.");
+        } finally {
+            setLoading(false);
+        }
+    }
+}
+
+function setLoading(status) {
+    sedangProses = status;
+    const btn = document.getElementById("btn-simpan");
+    if(status) {
+        btn.innerText = "Loading...";
+        btn.style.opacity = "0.6";
+    } else {
+        btn.innerText = document.getElementById("edit-id").value ? "Update Data" : "Simpan Data";
+        btn.style.opacity = "1";
+    }
+}
+
+function bersih(){
+    document.querySelectorAll("input").forEach(i=>{
+        if(i.type!="number" && i.id!="cari" && i.id!="edit-id")
+            i.value="";
+    });
+    awal.value="";
+    tambah.value=0;
+    kurang.value=0;
+}
+
+function filterData(){
+    let key=cari.value.toLowerCase();
+    let rows=document.querySelectorAll("#tbody tr");
+    rows.forEach(r=>{
+        let nama=r.cells[1].innerText.toLowerCase();
+        r.style.display=nama.includes(key)?"":"none";
+    });
+}
+
+loadData();
+</script>
+
+</body>
+</html>

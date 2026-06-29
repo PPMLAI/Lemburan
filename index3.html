@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMPATI LAI - History Card Mesin</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:#f4f6f9;
+}
+
+header{
+background:linear-gradient(135deg,#003366,#005baa);
+color:white;
+padding:20px;
+display:flex;
+align-items:center;
+gap:20px;
+box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+
+.logo{
+width:70px;
+height:70px;
+border-radius:50%;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:bold;
+color:#005baa;
+}
+
+.header-text h1{
+font-size:28px;
+}
+
+.header-text p{
+opacity:.9;
+}
+
+.summary{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+padding:20px;
+}
+
+.box{
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 3px 10px rgba(0,0,0,.1);
+text-align:center;
+}
+
+.box h2{
+color:#005baa;
+font-size:30px;
+}
+
+.search{
+padding:0 20px 10px;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+.dashboard-table-container {
+padding: 0 20px 20px;
+}
+
+.table-wrapper {
+background: white;
+padding: 20px;
+border-radius: 15px;
+box-shadow: 0 3px 10px rgba(0,0,0,.1);
+overflow-x: auto;
+}
+
+.table-wrapper h3 {
+color: #003366;
+margin-bottom: 15px;
+font-size: 18px;
+border-left: 4px solid #005baa;
+padding-left: 10px;
+}
+
+.main-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.main-table th {
+background: #005baa;
+color: white;
+padding: 12px 10px;
+font-size: 14px;
+text-align: left;
+}
+
+.main-table td {
+padding: 10px;
+border-bottom: 1px solid #ddd;
+font-size: 13.5px;
+color: #333;
+}
+
+.main-table tbody tr:hover {
+background-color: #f9fbfd;
+}
+
+.badge {
+padding: 4px 8px;
+border-radius: 6px;
+font-size: 11px;
+font-weight: bold;
+text-transform: uppercase;
+}
+.badge-normal { background: #e2fbd7; color: #34b53a; }
+.badge-monitoring { background: #fff3cd; color: #856404; }
+.badge-rusak { background: #f8d7da; color: #721c24; }
+
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:white;
+border-radius:15px;
+padding:20px;
+box-shadow:0 3px 10px rgba(0,0,0,.15);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card h3{
+color:#005baa;
+margin-bottom:10px;
+}
+
+.card p{
+margin-bottom:5px;
+font-size:14px;
+}
+
+.btn{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
+
+.btn-primary{
+background:#005baa;
+color:white;
+}
+
+.btn-primary:disabled {
+background: #ccc;
+cursor: not-allowed;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+justify-content:center;
+align-items:center;
+z-index: 100;
+}
+
+.modal-content{
+background:white;
+padding:25px;
+border-radius:15px;
+width:90%;
+max-width:700px;
+max-height:90vh;
+overflow:auto;
+}
+
+.modal-content h2{
+margin-bottom:15px;
+color:#005baa;
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+label {
+display: block;
+font-size: 13px;
+font-weight: bold;
+margin-bottom: 5px;
+color: #333;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+table th{
+background:#005baa;
+color:white;
+padding:8px;
+}
+
+table td{
+padding:8px;
+border:1px solid #ddd;
+font-size:13px;
+text-align: center;
+}
+
+.close{
+float:right;
+cursor:pointer;
+font-size:22px;
+color:red;
+}
+
+.footer{
+padding:15px;
+text-align:center;
+background:#003366;
+color:white;
+margin-top:20px;
+}
+
+.loading-text {
+text-align: center;
+grid-column: 1 / -1;
+font-size: 18px;
+color: #666;
+padding: 20px;
+}
+
+.img-preview {
+max-width: 60px;
+max-height: 60px;
+object-fit: cover;
+border-radius: 5px;
+cursor: pointer;
+transition: 0.2s;
+}
+
+.img-preview:hover {
+transform: scale(1.1);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">LAI</div>
+<div class="header-text">
+<h1>Histori CARD</h1>
+<p>Sistem Informasi Maintenance Mesin Percetakan LAI</p>
+</div>
+</header>
+
+<div class="summary">
+<div class="box">
+<h2 id="totalMesin">30</h2>
+<p>Total Mesin</p>
+</div>
+
+<div class="box">
+<h2 id="totalHistory">0</h2>
+<p>Total History</p>
+</div>
+
+<div class="box">
+<h2 id="totalPM">0</h2>
+<p>Total Maintenance</p>
+</div>
+</div>
+
+<div class="search">
+<input type="text" id="search" placeholder="Cari Nama Mesin, Teknisi, atau Jenis Maintenance...">
+</div>
+
+<div class="dashboard-table-container">
+    <div class="table-wrapper">
+        <h3>Log Histori Maintenance Terbaru</h3>
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Nama Mesin</th>
+                    <th>Teknisi</th>
+                    <th>Jenis Maintenance</th>
+                    <th>Sparepart</th>
+                    <th>Keterangan</th>
+                    <th>Status</th>
+                    <th>Foto</th>
+                </tr>
+            </thead>
+            <tbody id="dashboardTableBody">
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #888; padding: 20px;">
+                        Memuat tabel data histori...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container" id="machineContainer">
+    <div class="loading-text">Mengambil data dari Google Sheets...</div>
+</div>
+
+<div class="modal" id="historyModal">
+<div class="modal-content">
+
+<span class="close" onclick="closeModal()">&times;</span>
+
+<h2 id="modalTitle"></h2>
+
+<form id="historyForm">
+
+<input type="date" id="tanggal" required>
+
+<input type="text" id="teknisi"
+placeholder="Nama Teknisi" required>
+
+<select id="jenis">
+<option>Preventive Maintenance</option>
+<option>Corrective Maintenance</option>
+<option>Breakdown</option>
+</select>
+
+<input type="text" id="sparepart"
+placeholder="Sparepart Diganti">
+
+<textarea id="keterangan"
+placeholder="Keterangan"></textarea>
+
+<select id="status">
+<option>Normal</option>
+<option>Perlu Monitoring</option>
+<option>Rusak</option>
+</select>
+
+<label for="foto">Upload Foto Kerusakan / Maintenance (Opsional):</label>
+<input type="file" id="foto" accept="image/*">
+
+<button type="submit" id="submitBtn" class="btn btn-primary">
+Simpan History
+</button>
+
+</form>
+
+<table>
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Teknisi</th>
+<th>Jenis</th>
+<th>Sparepart</th>
+<th>Status</th>
+<th>Foto</th> </tr>
+</thead>
+
+<tbody id="historyTable"></tbody>
+</table>
+
+</div>
+</div>
+
+<div class="footer">
+© 2026 GUSPUR PPM LAI - History Card Mesin Percetakan
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbw--ossghxQcxot5qsAiicJWWG6vcSl8CFJWeq-lYzoFoU5KjM1jVUiC8JndVjZq_Oc/exec";
+
+const mesinList = [
+"Mesin CTCP", "Mesin Polar 92", "Mesin Goss 1", "Mesin Goss 2", "Mesin SM",
+"Mesin Counter Stacker", "Mesin Stahlfolder", "Mesin Gathering", "Mesin Ventura 1",
+"Mesin Ventura 2", "Mesin Ventura 3", "Mesin BBL 30", "Mesin 3 Knife", "Mesin BL 500",
+"Mesin EP", "Mesin Pilung", "Mesin Jahit Kawat", "Mesin Meiwa", "Mesin Shrink LC6000",
+"Mesin Shrink Polypack", "Mesin Genset Cummins Lama", "Mesin Genset Cummins Baru",
+"Mesin Genset Server", "Kompressor BOGE", "Kompressor KAISHAN", "Kompressor MMI 1",
+"Kompressor MMI 2", "POLAR 115", "Mesin ROUND CORNER 1", "Mesin ROUND CORNER 2"
+];
+
+let currentMachine = "";
+let allSheetsData = []; 
+
+// PERUBAHAN: Fungsi pembantu untuk mengubah format ISO string/YYYY-MM-DD menjadi Format Indonesia
+function formatTanggalIndonesia(dateString) {
+    if (!dateString || dateString === "-") return "-";
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString; // Mengembalikan string asli jika gagal parse
+        
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+async function fetchDataFromSheet() {
+    try {
+        const response = await fetch(API_URL);
+        allSheetsData = await response.json();
+        
+        allSheetsData.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+        
+        renderMachines();
+        renderDashboardTable(allSheetsData);
+    } catch (error) {
+        console.error("Gagal mengambil data:", error);
+        document.getElementById("machineContainer").innerHTML = `<div class="loading-text" style="color:red;">Gagal memuat data dari Spreadsheet. Pastikan URL API benar.</div>`;
+        document.getElementById("dashboardTableBody").innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Gagal memuat data histori global.</td></tr>`;
+    }
+}
+
+function renderMachines(){
+    const container = document.getElementById("machineContainer");
+    container.innerHTML = "";
+
+    mesinList.forEach(mesin => {
+        const data = allSheetsData.filter(item => item.mesin === mesin);
+        const last = data.length ? data[0].tanggal : "-";
+
+        container.innerHTML += `
+        <div class="card" data-mesin="${mesin.toLowerCase()}">
+        <h3>${mesin}</h3>
+        <p>Total History : ${data.length}</p>
+        <p>Terakhir Maintenance : ${formatTanggalIndonesia(last)}</p>
+        <button class="btn btn-primary" onclick="openMachine('${mesin}')">Lihat History</button>
+        </div>
+        `;
+    });
+
+    updateSummary();
+}
+
+function renderDashboardTable(dataToRender) {
+    const tableBody = document.getElementById("dashboardTableBody");
+    
+    if (dataToRender.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888; padding: 15px;">Tidak ada data histori ditemukan.</td></tr>`;
+        return;
+    }
+
+    let html = "";
+    dataToRender.forEach(item => {
+        let fotoHtml = "-";
+        if (item.foto && item.foto.startsWith("data:image")) {
+            fotoHtml = `<a href="${item.foto}" target="_blank"><img src="${item.foto}" class="img-preview" title="Klik untuk perbesar"></a>`;
+        } else if (item.foto && item.foto !== "-") {
+            fotoHtml = `<a href="${item.foto}" target="_blank">Lihat Foto</a>`;
+        }
+
+        let statusBadge = "-";
+        if(item.status) {
+            let badgeClass = "badge-normal";
+            if(item.status.toLowerCase() === "perlu monitoring") badgeClass = "badge-monitoring";
+            if(item.status.toLowerCase() === "rusak") badgeClass = "badge-rusak";
+            statusBadge = `<span class="badge ${badgeClass}">${item.status}</span>`;
+        }
+
+        html += `
+        <tr>
+            <td>${formatTanggalIndonesia(item.tanggal)}</td>
+            <td style="font-weight:bold; color:#005baa;">${item.mesin || '-'}</td>
+            <td>${item.teknisi || '-'}</td>
+            <td>${item.jenis || '-'}</td>
+            <td>${item.sparepart || '-'}</td>
+            <td style="text-align: left;">${item.keterangan || '-'}</td>
+            <td>${statusBadge}</td>
+            <td>${fotoHtml}</td>
+        </tr>
+        `;
+    });
+    tableBody.innerHTML = html;
+}
+
+function openMachine(machine){
+    currentMachine = machine;
+    document.getElementById("modalTitle").innerText = machine;
+    document.getElementById("historyModal").style.display = "flex";
+    loadHistory(machine);
+}
+
+function closeModal(){
+    document.getElementById("historyModal").style.display = "none";
+}
+
+function loadHistory(machine){
+    const data = allSheetsData.filter(item => item.mesin === machine);
+    let html = "";
+
+    data.forEach(item => {
+        let fotoHtml = "-";
+        if (item.foto && item.foto.startsWith("data:image")) {
+            fotoHtml = `<a href="${item.foto}" target="_blank"><img src="${item.foto}" class="img-preview" title="Klik untuk perbesar"></a>`;
+        } else if (item.foto && item.foto !== "-") {
+            fotoHtml = `<a href="${item.foto}" target="_blank">Lihat Foto</a>`;
+        }
+
+        html += `
+        <tr>
+        <td>${formatTanggalIndonesia(item.tanggal)}</td>
+        <td>${item.teknisi || '-'}</td>
+        <td>${item.jenis || '-'}</td>
+        <td>${item.sparepart || '-'}</td>
+        <td>${item.status || '-'}</td>
+        <td>${fotoHtml}</td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("historyTable").innerHTML = html;
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+document.getElementById("historyForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.innerText = "Menyimpan...";
+    submitBtn.disabled = true;
+
+    const fileInput = document.getElementById("foto");
+    let fotoBase64 = "-";
+    
+    if (fileInput.files.length > 0) {
+        try {
+            fotoBase64 = await fileToBase64(fileInput.files[0]);
+        } catch (err) {
+            console.error("Gagal memproses gambar:", err);
+            alert("Gagal memproses file gambar.");
+            submitBtn.innerText = "Simpan History";
+            submitBtn.disabled = false;
+            return;
+        }
+    }
+
+    const payload = {
+        mesin: currentMachine,
+        tanggal: document.getElementById("tanggal").value,
+        teknisi: document.getElementById("teknisi").value,
+        jenis: document.getElementById("jenis").value,
+        sparepart: document.getElementById("sparepart").value,
+        keterangan: document.getElementById("keterangan").value,
+        status: document.getElementById("status").value,
+        foto: fotoBase64
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if(result.status === "success") {
+            allSheetsData.unshift(payload);
+            this.reset();
+            loadHistory(currentMachine);
+            renderMachines();
+            renderDashboardTable(allSheetsData);
+        } else {
+            alert("Gagal menyimpan ke spreadsheet: " + result.message);
+        }
+    } catch (error) {
+        console.error("Error saat menyimpan:", error);
+        alert("Terjadi kesalahan jaringan.");
+    } finally {
+        submitBtn.innerText = "Simpan History";
+        submitBtn.disabled = false;
+    }
+});
+
+function updateSummary(){
+    const total = allSheetsData.length;
+    const totalPM = allSheetsData.filter(item => item.jenis === "Preventive Maintenance").length;
+
+    document.getElementById("totalHistory").innerText = total;
+    document.getElementById("totalPM").innerText = totalPM;
+}
+
+document.getElementById("search").addEventListener("keyup", function(){
+    const keyword = this.value.toLowerCase();
+    
+    const cards = document.querySelectorAll(".card");
+    cards.forEach(card => {
+        const namaMesin = card.getAttribute("data-mesin");
+        card.style.display = namaMesin.includes(keyword) ? "block" : "none";
+    });
+
+    const filteredData = allSheetsData.filter(item => {
+        return (item.mesin && item.mesin.toLowerCase().includes(keyword)) ||
+               (item.teknisi && item.teknisi.toLowerCase().includes(keyword)) ||
+               (item.jenis && item.jenis.toLowerCase().includes(keyword)) ||
+               (item.sparepart && item.sparepart.toLowerCase().includes(keyword)) ||
+               (item.keterangan && item.keterangan.toLowerCase().includes(keyword));
+    });
+    renderDashboardTable(filteredData);
+});
+
+fetchDataFromSheet();
+</script>
+
+</body>
+</html>

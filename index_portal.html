@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUSPUR PPM LAI - Industrial Integrated Portal</title>
+    <style>
+        /* INDUSTRIAL COLOR PALETTE & VARIABLES */
+        :root {
+            --bg-dark: #1e2229;       /* Deep Charcoal */
+            --bg-side: #282c34;       /* Iron / Dark Steel */
+            --text-light: #f4f5f7;    /* Aluminum White */
+            --text-muted: #9da5b4;    /* Oxidized Silver */
+            --accent-color: #f2a900;  /* Industrial Safety Yellow / Amber */
+            --accent-hover: #d49200;  /* Burned Amber */
+            --border-color: #3e4451;  /* Steel Plate Joint */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-side);
+            border-right: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #15181f 0%, #282c34 100%);
+            border-bottom: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+        }
+
+        .nav-item a:hover, .nav-item.active a {
+            background-color: rgba(242, 169, 0, 0.1);
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item a .icon {
+            margin-right: 15px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            background-color: #15181f;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-dark);
+            position: relative;
+        }
+
+        .top-bar {
+            height: 60px;
+            background-color: var(--bg-side);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .page-title {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--text-light);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        .content-frame-wrapper {
+            flex-grow: 1;
+            position: relative;
+            background: #fff; /* Memberikan background netral putih untuk dokumen di dalam iframe */
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* HOME / DASHBOARD SCREEN VIEW */
+        .home-view {
+            padding: 40px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            background-color: #1a1d24;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #232731 0%, #15181f 100%);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
+            padding: 30px;
+            border-radius: 4px;
+        }
+
+        .welcome-card h1 {
+            font-size: 2rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .welcome-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .grid-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background-color: var(--bg-side);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .module-card h3 {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .module-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .module-card .btn-go {
+            align-self: flex-start;
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .module-card:hover .btn-go {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        /* Utility Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .content-frame-wrapper { height: calc(100vh - 200px); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>GUSPUR PPM LAI</h2>
+            <p>INTEGRATED CONTROL SYSTEM</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item active" id="menu-home">
+                <a href="#" onclick="switchView('home', 'Beranda Utama')">
+                    <span class="icon">⌂</span> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="switchView('index4.html', 'Akses SIMPATI LAI & Formulir')">
+                    <span class="icon">🔒</span> Login &amp; Portal Form
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="switchView('index.html', 'Pemeriksaan Penerangan LAI')">
+                    <span class="icon">💡</span> Pemeriksaan Lampu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="switchView('index1.html', 'Inventory Control (Stok)')">
+                    <span class="icon">📦</span> Inventory Stok v1
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="switchView('index2.html', 'Inventory Control (Permohonan)')">
+                    <span class="icon">📋</span> Inventory PO v2
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="switchView('index3.html', 'SIMPATI LAI - History Card Mesin')">
+                    <span class="icon">⚙️</span> History Card Mesin
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            © 2026 GUSPUR-PPM LAI INTEGRATED CONTROL SYSTEM
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div class="page-title" id="current-title">Beranda Utama</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="current-time">SYSTEM ONLINE</div>
+        </div>
+
+        <div class="content-frame-wrapper">
+            <div id="home-view" class="home-view">
+                <div class="welcome-card">
+                    <h1>Sistem Kontrol Terintegrasi PPM LAI</h1>
+                    <p>Selamat datang di dashboard industrial utama. Ruang lingkup aplikasi ini menggabungkan pencatatan inventaris, pelaporan kerusakan lampu penerangan, manajemen riwayat kartu mesin, serta pengisian lembar kerja teknisi secara terpadu.</p>
+                </div>
+
+                <div class="grid-modules">
+                    <div class="module-card" onclick="switchView('index4.html', 'Akses SIMPATI LAI & Formulir')">
+                        <div>
+                            <h3>Portal Utama SIMPATI LAI</h3>
+                            <p>Gerbang otentikasi login teknisi menuju form resmi: Maintenance Genset, Perbaikan Mesin, dan Pengajuan Pembelian Barang.</p>
+                        </div>
+                        <button class="btn-go">Buka Modul</button>
+                    </div>
+
+                    <div class="module-card" onclick="switchView('index.html', 'Pemeriksaan Penerangan LAI')">
+                        <div>
+                            <h3>Pemeriksaan Penerangan</h3>
+                            <p>Aplikasi pelaporan kondisi lampu penerangan area LAI, pemantauan status normal maupun rusak/mati secara real-time.</p>
+                        </div>
+                        <button class="btn-go">Buka Modul</button>
+                    </div>
+
+                    <div class="module-card" onclick="switchView('index1.html', 'Inventory Control (Stok)')">
+                        <div>
+                            <h3>Inventory Control (Stok)</h3>
+                            <p>Sistem manajemen jumlah item barang gudang, memproses transaksi penambahan, pengurangan, dan kalkulasi sisa stok.</p>
+                        </div>
+                        <button class="btn-go">Buka Modul</button>
+                    </div>
+
+                    <div class="module-card" onclick="switchView('index2.html', 'Inventory Control (Permohonan)')">
+                        <div>
+                            <h3>Inventory PO (Proses Procurement)</h3>
+                            <p>Melacak administrasi permohonan barang, penomoran form, penentuan kode barang, hingga status Purchase Order (PO).</p>
+                        </div>
+                        <button class="btn-go">Buka Modul</button>
+                    </div>
+
+                    <div class="module-card" onclick="switchView('index3.html', 'SIMPATI LAI - History Card Mesin')">
+                        <div>
+                            <h3>History Card Mesin</h3>
+                            <p>Rekam jejak digital perawatan mesin produksi, tindakan Preventive Maintenance (PM), penggantian sparepart, dan catatan penanggung jawab teknisi.</p>
+                        </div>
+                        <button class="btn-go">Buka Modul</button>
+                    </div>
+                </div>
+            </div>
+
+            <iframe id="app-frame" class="content-frame" style="display: none;"></iframe>
+        </div>
+    </main>
+
+    <script>
+        function switchView(target, title) {
+            const homeView = document.getElementById('home-view');
+            const appFrame = document.getElementById('app-frame');
+            const titleDisplay = document.getElementById('current-title');
+            
+            // Update Judul Top Bar
+            titleDisplay.innerText = title;
+
+            // Atur Visibilitas Konten
+            if(target === 'home') {
+                homeView.style.display = 'flex';
+                appFrame.style.display = 'none';
+                appFrame.src = '';
+            } else {
+                homeView.style.display = 'none';
+                appFrame.style.display = 'block';
+                appFrame.src = target; // Memanggil file index HTML internal Anda
+            }
+
+            // Atur Status Navigasi Aktif di Sidebar
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Cari item menu yang diklik untuk menambahkan class 'active'
+            event.currentTarget.classList ? event.currentTarget.classList.add('active') : event.target.parentElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
