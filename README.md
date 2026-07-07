@@ -1,1 +1,1 @@
-Aplikasi Ngadadak Absensi Peserta Family Gathering LAI 2026
+Aplikasi sederhana perhitungan cuti Karyawan PPM LAI
